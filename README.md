@@ -4,7 +4,7 @@
 
 ## Preview
 
-[![Resume Preview](https://startbootstrap.com/assets/img/templates/resume.jpg)](https://blackrockdigital.github.io/startbootstrap-resume/)
+[![Resume Preview](https://startbootstrap.com/assets/img/templates/resume.jpg)](https://sanjayapandey.github.io/)
 
 **[View Live Preview](https://sanjayapandey.github.io/)**
 
