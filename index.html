@@ -1,315 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanjaya Pandey | Portfolio</title>
+    <!-- Tailwind or Bootstrap can be kept, but we use custom CSS for the full-page layout -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #1a1a1a;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
 
-  <head>
+        /* Full page viewer wrapper */
+        #portfolio-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px; /* For 3D transitions if desired */
+        }
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+        /* The canvas wrapper holding the pages */
+        .page-viewport {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 1200px; /* Keeps landscape portfolios looking sharp */
+            max-height: 90vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
-    <title>Sanjaya Pandey</title>
+        canvas {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 4px;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+        }
 
-    <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+        /* Animation classes */
+        .slide-out-left {
+            transform: translateX(-120%) rotateY(-15deg);
+            opacity: 0;
+        }
 
-    <!-- Custom fonts for this template -->
-    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet">
-    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+        .slide-out-right {
+            transform: translateX(120%) rotateY(15deg);
+            opacity: 0;
+        }
 
-    <!-- Custom styles for this template -->
-    <link href="css/resume.min.css" rel="stylesheet">
+        .slide-in-left {
+            animation: slideInLeft 0.6s forwards cubic-bezier(0.25, 1, 0.5, 1);
+        }
 
-  </head>
+        .slide-in-right {
+            animation: slideInRight 0.6s forwards cubic-bezier(0.25, 1, 0.5, 1);
+        }
 
-  <body id="page-top">
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%) rotateY(-15deg); opacity: 0; }
+            to { transform: translateX(0) rotateY(0); opacity: 1; }
+        }
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
-      <a class="navbar-brand js-scroll-trigger" href="#page-top">
-        <span class="d-block d-lg-none">Sanjaya Pandey</span>
-        <span class="d-none d-lg-block">
-          <img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="img/profile.jpg" alt="">
-        </span>
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="#about">About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="#experience">Experience</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="#education">Education</a>
-          </li>
- 	<li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="#technical-projects">Projects</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="#skills">Skills</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="#leadership">Leadership</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="#achievement">Achievement</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+        @keyframes slideInRight {
+            from { transform: translateX(100%) rotateY(15deg); opacity: 0; }
+            to { transform: translateX(0) rotateY(0); opacity: 1; }
+        }
 
-    <div class="container-fluid p-0">
+        /* Navigation Floating UI */
+        .nav-overlay {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 10px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-      <section class="resume-section p-3 p-lg-5 d-flex d-column" id="about">
-        <div class="my-auto">
-          <h1 class="mb-0">Sanjaya
-            <span class="text-primary">Pandey</span>
-          </h1>
-          <div class="subheading mb-4">17050 &nbsp; Mechanicsburg  PA &nbsp;| &nbsp; &nbsp;(347)613-6674 &nbsp; | &nbsp;
-            <a href="mailto:pandeysanjaya4@gmail.com">pandeysanjaya4@gmail.com</a>
-          </div>
-          <p class="lead mb-4">I started my professional career from Leapfrog Technologies Inc., a software company headquartered in Seattle, WA. Working in the Java architecture team as a Software Engineer, I got a chance to envision, design and develop scalable software solutions in an agile environment. At Leapfrog, I worked on SAAS application named Small Business Workbench (a cash forecasting app) where I implemented Content Delivery Network throughout the application using Amazon S3 cloud storage and successfully integrated cash forecasting app with Intuit QuickBooks. I also worked on Anti Money Laundering System (AML) which enables the subscribers (banks) to search entities against global/localized sanctions list and social media.</br>
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px 15px;
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
 
-In Spring 2017, I started pursuing my master's degree in Computer Science at the University Of North Dakota, with a focus on Algorithm, Software Engineering, and Artificial Intelligence. Building on the foundation laid at work, I took courses like Advance Artificial Intelligence, High-Performance Computing and Software Architecture that aligned with my passion for building quality software systems. </br>
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
 
-I am interested in algorithm optimization and machine learning. I am a highly motivated, quick learner, able to work independently or on a team and drive solutions. Currently, I am actively seeking challenging fulltime opportunity in software development and research.</p>
-          <div class="social-icons">
-            <a href="https://www.linkedin.com/in/sanjaya-pandey/">
-              <i class="fab fa-linkedin-in"></i>
-            </a>
-            <a href="https://github.com/sanjayapandey">
-              <i class="fab fa-github"></i>
-            </a>
-          </div>
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            color: #ccc;
+            font-size: 0.9rem;
+            user-select: none;
+        }
+
+        /* Quick loading indicator */
+        #loader {
+            position: absolute;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="portfolio-container">
+        <div id="loader">Loading Portfolio...</div>
+        <div class="page-viewport">
+            <canvas id="pdf-canvas"></canvas>
         </div>
-      </section>
-
-      <hr class="m-0">
-
-      <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="experience">
-        <div class="my-auto">
-          <h2 class="mb-4">Experience</h2>
-	<div class="resume-item d-flex flex-column flex-md-row mb-4">
-            <div class="resume-content mr-auto">
-              <h3 class="mb-0">Graduate Assistant</h3>
-              <div class="subheading mb-3">University of North Dakota, Grand Forks, ND</div>
-              <p>• Developed a software requirement tool to track the development of CubeSat Project (an ongoing project at University Of
-	North Dakota)</br>
-	• Successfully designed and developed a module in collaboration with professor, having features to create projects,
-	functional requirements, non-functional requirements and test-cases.</br>
-	• Published a research paper “Towards Cyber-Physical Requirement Engineering Elicitation Tool Support." in World
-	Automation Congress (WAC). IEEE, 2018. [<a href="https://ieeexplore.ieee.org/document/8430399" target="_blank">paper link</a>]</br>
-	 • As a teaching assistant, conducted C/C++ labs and evaluated assignments, exams & projects of the undergraduate students </br>
-	Project source code: [<a href="https://github.com/sanjayapandey/software-tool" target="_blank">here</a>] <br>
-	<i>(Technology used: Java, Spring MVC, JSP, MySQL, Tomcat, Git)</i><br>
-	</p>
-
-            </div>
-            <div class="resume-date text-md-right">
-              <span class="text-primary">January 2017 – December 2018</span>
-            </div>
-          </div>
-
-          <div class="resume-item d-flex flex-column flex-md-row mb-4">
-            <div class="resume-content mr-auto">
-              <h3 class="mb-0">Software Engineer</h3>
-              <div class="subheading mb-3">Leapfrog Technology Inc., Seattle, WA</div>
-              <p>
-		      <strong>Project: Small Business Workbench </strong></br>
-		• Worked in development and functional testing of java-based cash forecasting application</br>
-		• Actively involved in requirement gathering, analysis, design, implementation, testing and deployment of the application</br>
-		• Implemented Content Delivery Network throughout the application using Amazon S3 cloud storage</br>
-		• As a team lead, successfully integrated cash forecasting app with Intuit QuickBooks</br>
-		• Created OKR application for Human Resource on Leapfrog-Hackathon 2016<br><br>
-			<strong> Project: Anti Money Laundering System (AML)</strong></br>
-               • AML system enables the subscribers (banks) to search entities against global and localized sanctions list</br>
-               • Implemented google custom search API for News search and twitter search API for social media search.</br>
-               • Designed and implemented reporting module using JasperReports library.</br><br>
-		<i>(Technology used: Java, Spring MVC Liferay, JSP, MySQL, JavaScript, jQuery, HTML/CSS, Tomcat, JBoss, Git)</i>
-		</p>
-            </div>
-            <div class="resume-date text-md-right">
-              <span class="text-primary">November 2012 - May 2016</span>
-            </div>
-          </div>
-	<!--div class="resume-item d-flex flex-column flex-md-row mb-4">
-            <div class="resume-content mr-auto">
-              <h3 class="mb-0">Software Intern</h3>
-              <div class="subheading mb-3">Verisk Information Technologies</div>
-              <p>
-		• Worked with database team to Extract, Transform, Load (ETL) healthcare data.</br>
-		• Learned Oracle 10g and PL/SQL</br>
-		</p>
-            </div>
-            <div class="resume-date text-md-right">
-              <span class="text-primary">September 2012 - November 2012</span>
-            </div>
-          </div-->
+        
+        <!-- Controls Floating Bar -->
+        <div class="nav-overlay" style="display: none;">
+            <button class="nav-btn" id="prev-btn">◀ Prev</button>
+            <span class="page-info">Page <span id="page-num">1</span> of <span id="page-count">0</span></span>
+            <button class="nav-btn" id="next-btn">Next ▶</button>
         </div>
-
-      </section>
-
-      <hr class="m-0">
-
-      <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="education">
-        <div class="my-auto">
-          <h2 class="mb-4">Education</h2>
-
-          <div class="resume-item d-flex flex-column flex-md-row mb-4">
-            <div class="resume-content mr-auto">
-              <h3 class="mb-0">University Of North Dakota, Grand Forks, ND</h3>
-              <div class="subheading mb-3">MS in Computer Science</div>
-              <p>Artificial Intelligence, Algorithms, High performance computing, Software Engineering</p>
-              <p>GPA: 3.90/4</p>
-            </div>
-            <div class="resume-date text-md-right">
-              <span class="text-primary">January 2017 - May 2019</span>
-            </div>
-          </div>
-
-          <div class="resume-item d-flex flex-column flex-md-row">
-            <div class="resume-content mr-auto">
-              <h3 class="mb-0">Institute of Engineering, Pulchowk Campus, Nepal</h3>
-              <div class="subheading mb-3">Bachelor’s in computer engineering</div>
-		<p>C/C++,Microprocessor,Data structure and algorithm,Algebra</p>
-              <p>GPA: 3.58/4.0</p>
-            </div>
-            <div class="resume-date text-md-right">
-              <span class="text-primary">December 2008 - October 2012</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <hr class="m-0">
-
-	 <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="technical-projects">
-        <div class="my-auto">
-          <h2 class="mb-4">Technical Projects</h2>
-	  <div class="resume-item d-flex flex-column flex-md-row mb-4">
-            <div class="resume-content mr-auto">
-              <h4 class="mb-0">Performance evaluation of n-body simulation problem, University Of North Dakota</h4>
-              <p>
-		• Implemented direct method to simulate the n-body problem</br>
-		• Parallelized the serial version of code and improved the performance of algorithm by 50-60% (by time) in High
-		Performance Computing Environment.</br>
-		<i>(Technology used: C++, OpenMP, MPI, CUDA, GPU programming)</i></br>
-		Project source code: [<a href="https://github.com/sanjayapandey/n-body-simulation" target="_blank">here</a>]
-		</p>
-            </div>
-            <div class="resume-date text-md-right">
-              <span class="text-primary">August 2018 – December 2018</span>
-            </div>
-          </div>
-	<div class="resume-item d-flex flex-column flex-md-row mb-4">
-            <div class="resume-content mr-auto">
-              <h4 class="mb-0">Customer Relationship Management (CRM) System for Restaurant</h4>
-              <p>
-		• Developed CRM application from scratch which includes Accounting, Front-Desk, Inventory and Point of Sale modules</br>
-		• Implemented multi-tenancy architecture, actively involved in code review and conducted knowledge sharing sessions to
-		the team
-		</p>
-            </div>
-            <div class="resume-date text-md-right">
-              <span class="text-primary">June 2016 – December 2016</span>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-      <hr class="m-0">
-      <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="skills">
-        <div class="my-auto">
-          <h2 class="mb-4">Skills</h2>
-
-          <p>
-		<strong>• Programming Languages:</strong> Java, C/C++, Android, JSP/Servlets, JavaScript, Node.js, Python, React,REST, CUDA, MPI, OpenMP<br>
-<strong>• Frameworks:</strong> Spring MVC, Hibernate/JPA, Liferay, Maven, JUnit</br>
-<strong>• Databases: </strong>MySQL, PostgreSQL, Oracle 12c, NoSQL</br>
-<strong>• Web Servers and tools:</strong> Tomcat, JBoss, Git/GitHub, SonarQube, Jenkins, Amazon Services (EC2, S3, CloudFront)</br>
-<strong>• Methodologies:</strong>SDLC, Agile, Scrum
-	</p>
-
-          <!--<div class="subheading mb-3">Soft Skills</div>
-          <ul class="fa-ul mb-0">
-            <li>
-              <i class="fa-li fa fa-check"></i>
-              Team Player</li>
-            <li>
-              <i class="fa-li fa fa-check"></i>
-              Agile Development &amp; Scrum</li>
-          </ul>
-        </div><-->
-      </section>
-	<hr class="m-0">
-
-      <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="leadership">
-        <div class="my-auto">
-          <h2 class="mb-4">Leadership</h2>
-
-          <div class="resume-item d-flex flex-column flex-md-row mb-4">
-            <div class="resume-content mr-auto">
-              <h4 class="mb-0">Member- International Organization, University of North Dakota, ND</h4>
-              <p>• Organized student events on campus and assisted new international students to get involved on campus events</p>
-            </div>
-            <div class="resume-date text-md-right">
-              <span class="text-primary">March 2017 - Present</span>
-            </div>
-          </div>
-
-          <div class="resume-item d-flex flex-column flex-md-row mb-4">
-            <div class="resume-content mr-auto">
-              <h4 class="mb-0">Public Relation Officer, National Tech Fest-LOCUS, Pulchowk Campus, Nepal</h4>
-              <p>• Organized 9 th technological national festival; Conducted promotion and interaction session with different personnel to
-encourage participation and for publicity of event</p>
-            </div>
-            <div class="resume-date text-md-right">
-              <span class="text-primary">June 2011 - March 2012</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <hr class="m-0">
-
-      <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="achievement">
-        <div class="my-auto">
-          <h2 class="mb-4">Awards &amp; Certifications</h2>
-          <ul class="fa-ul mb-0">
-            <li>
-              <i class="fa-li fa fa-trophy text-warning"></i>
-              Divide and Conquer, Sorting and Searching, and Randomized Algorithms
-		</li>
-            <li>
-              <i class="fa-li fa fa-trophy text-warning"></i>
-              Windows Server 2008 Administration Fundamentals</li>
-            <li>
-              <i class="fa-li fa fa-trophy text-warning"></i>
-              1<sup>st</sup>
-              Place - Leapfrog-Hackathon 2016</li>
-          </ul>
-        </div>
-      </section>
-
     </div>
 
-    <!-- Bootstrap core JavaScript -->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Points to the PDF uploaded directly in your root directory
+        const url = './Sanjaya Pandey.pdf'; 
 
-    <!-- Plugin JavaScript -->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
-    <!-- Custom scripts for this template -->
-    <script src="js/resume.min.js"></script>
+        let pdfDoc = null,
+            pageNum = 1,
+            pageIsRendering = false,
+            pageNumPending = null;
 
-  </body>
+        const scale = 1.5,
+              canvas = document.getElementById('pdf-canvas'),
+              ctx = canvas.getContext('2d'),
+              loader = document.getElementById('loader'),
+              navOverlay = document.querySelector('.nav-overlay');
 
+        // Render the page
+        const renderPage = num => {
+            pageIsRendering = true;
+
+            pdfDoc.getPage(num).then(page => {
+                const viewport = page.getViewport({ scale });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                const renderCtx = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+
+                page.render(renderCtx).promise.then(() => {
+                    pageIsRendering = false;
+
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+
+                // Update page counters
+                document.getElementById('page-num').textContent = num;
+            });
+        };
+
+        // Check for pages rendering and trigger animations
+        const queueRenderPage = (num, direction) => {
+            const canvasEl = document.getElementById('pdf-canvas');
+            
+            // Step A: Apply slide-out animation to current canvas
+            if (direction === 'next') {
+                canvasEl.className = 'slide-out-left';
+            } else if (direction === 'prev') {
+                canvasEl.className = 'slide-out-right';
+            }
+
+            // Step B: Wait for the slide-out to finish, render the new page, and slide it in
+            setTimeout(() => {
+                if (pageIsRendering) {
+                    pageNumPending = num;
+                } else {
+                    renderPage(num);
+                }
+
+                // Apply corresponding entry slide animation
+                if (direction === 'next') {
+                    canvasEl.className = 'slide-in-right';
+                } else if (direction === 'prev') {
+                    canvasEl.className = 'slide-in-left';
+                }
+            }, 300); // Matches CSS transition duration halfway
+        };
+
+        // Show Previous Page
+        const showPrevPage = () => {
+            if (pageNum <= 1) return;
+            pageNum--;
+            queueRenderPage(pageNum, 'prev');
+        };
+
+        // Show Next Page
+        const showNextPage = () => {
+            if (pageNum >= pdfDoc.numPages) return;
+            pageNum++;
+            queueRenderPage(pageNum, 'next');
+        };
+
+        // Load Document
+        pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
+            pdfDoc = pdfDoc_;
+            document.getElementById('page-count').textContent = pdfDoc.numPages;
+
+            loader.style.display = 'none';
+            navOverlay.style.display = 'flex';
+
+            renderPage(pageNum);
+        }).catch(err => {
+            loader.textContent = "Error loading PDF portfolio.";
+            console.error(err);
+        });
+
+        // Button Events
+        document.getElementById('prev-btn').addEventListener('click', showPrevPage);
+        document.getElementById('next-btn').addEventListener('click', showNextPage);
+
+        // Keyboard Arrow Navigation
+        window.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') showNextPage();
+            if (e.key === 'ArrowLeft') showPrevPage();
+        });
+    </script>
+</body>
 </html>
